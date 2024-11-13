@@ -1,0 +1,128 @@
+<style>
+    table td {
+        BORDER-COLLAPSE: collapse
+    }
+
+    .goodslist {
+        width: 100%;
+    }
+
+    .countnum {
+        width: 50px;
+        padding: 6px 6px
+    }
+    .clear {
+        clear: both;
+    }
+    .wleft {
+        float: left;
+    }
+    .wtext {
+        height: 35px;
+        line-height: 35px;
+    }
+    .wtitle {
+        font-weight: bold;
+        font-size: 20px;
+    }
+    .returnnum,.returntype,.returnreason{
+        margin-right: 10px;
+    }
+</style>
+
+<div id="content-container">
+    <form id="add-form" class="form-horizontal form-ajax" role="form" data-toggle="validator" method="POST" action="">
+        {:token()}
+        <div class="">
+            <div class="panel-body">
+
+                <div class="row">
+                    <table class="goodslist table table-striped table-bordered table-hover table-nowrap">
+                        <tr>
+                            <th>商品名称</th>
+                            <th>sku_id</th>
+                            <th>价格</th>
+                            <th>备注</th>
+                            <th>可退数量</th>
+                        </tr>
+                        {foreach name="item.goods_arr" item="vo"}
+                        <tr>
+                            <td>
+                                {$vo.sku_name}
+                            </td>
+                            <td>{$vo.sku_id}</td>
+                            <td>{$vo.sku_jd_price}</td>
+                            <td>{$vo.remark}</td>
+                            <td>{$vo.can_count}</td>
+                        </tr>
+                        {if $vo.canApply}
+                        <tr>
+                            <td colspan="5">
+                                <div class="wleft returnnum">
+                                    <span class="wleft wtext">退货数量：</span>
+                                    <input type="number" name="apply_no_{$vo.sku_id}" value="0" min="0"
+                                           max="{$vo.can_count}" class="wleft form-control countnum count-{$vo.sku_id}"
+                                           size="10">
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="wleft returntype">
+                                    <select class="wleft form-control apply_type" data-skuid="{$vo.sku_id}" name="apply_type_{$vo.sku_id}">
+                                        <option value="">选择退换类型</option>
+                                        {foreach name="vo.afsTypeName" item="vv"}
+                                        <option value="{$vv.afsType}">{$vv.afsTypeName}</option>
+                                        {/foreach}
+                                    </select>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="wleft returnreason">
+                                    <select class="wleft form-control reason-{$vo.sku_id}" data-skuid="{$vo.sku_id}" name="reason_{$vo.sku_id}">
+                                        <option value="">选择退换原因</option>
+                                    </select>
+                                </div>
+                                <div class="wleft returnreason">
+                                    <span class="wleft wtext">
+                                        申请问题描述：
+                                    </span>
+                                    <input type="text" name="apply_reason_name_{$vo.sku_id}" max="{$vo.can_count}" class="wleft form-control apply_reason_name-{$vo.sku_id}" style="width:200px;">
+                                </div>
+                                <div class="wleft returnbtn">
+                                    <input type="button" name="dobutton" data-skuid="{$vo.sku_id}" class="btn btn-danger dobutton" value="提交售后">
+                                </div>
+                                <div class="clear"></div>
+                            </td>
+                        </tr>
+                        {/if}
+                        {/foreach}
+                    </table>
+                    <div class="ctitle">退换记录</div>
+                    <table class="goodslist table table-striped table-bordered table-hover table-nowrap">
+                        <tr>
+                            <th>申请单号</th>
+                            <th>sku_id</th>
+                            <th>退换类型</th>
+                            <th>退换数量</th>
+                            <th>退换原因</th>
+                            <th>操作</th>
+                        </tr>
+                        {foreach name="orderReturnLog" item="vo"}
+                        <tr>
+                            <td>{$vo.apply_id}</td>
+                            <td>{$vo.skuid}</td>
+                            <td>{$vo.text_type}</td>
+                            <td>{$vo.returns_num}</td>
+                            <td>{$vo.reason_msg}</td>
+                            <td>
+                                {if $vo.approve_result}
+                                    <a href="{:url('cms/order/returns_send_logistics',array('id'=>$vo->id))}" data-title="回传客户发货信息" class="returns_logistics btn btn-dialog">回传发货信息</a>
+                                {/if}
+                            </td>
+                        </tr>
+                        {/foreach}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="order_id" id="order_id" value="{$orderId}">
+        <input type="hidden" name="ids" id="ids" value="{$ids}">
+    </form>
+</div>
